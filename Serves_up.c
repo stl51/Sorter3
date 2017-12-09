@@ -10,6 +10,7 @@
 #define PORT 26925
 int status = 1; // for server running status
 int num_of_thread = 0; // currently created num of threads
+int array_size=1;
 pthread_mutex_t countlock=PTHREAD_MUTEX_INITIALIZER;
 
 int main(int argc, char **argv){
@@ -19,6 +20,7 @@ int main(int argc, char **argv){
 	int client_sock;
 	
 	struct sockaddr_in address;
+	pthread_t * tids = (pthread_t*)malloc(sizeof(pthread_t) * 1);
 	
 	//setup of server socket
 	if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) <= 0)
@@ -76,11 +78,18 @@ int main(int argc, char **argv){
 		{
 		
 		//get a tid...somehow
+		
 		// replace socket of a tid with the client socket
+			if (num_of_thread > array_size) {
+				array_size = array_size * 2;
+				tids = (pthread_t*)realloc(tids, sizeof(pthread_t)*array_size);
+			}
+		
 		//	tid_pool[i].socketfd = client_sock;
 		
 		//use tid to create a thread which calls the helper method
-			pthread_create(&tid_pool[i].tid, NULL, service, (void *)i);
+	//	pthread_create(&(tids[spawns - 1]), 0, (void*) run_thru, (void*) arg);
+			pthread_create(&(tids[spawns - 1]) NULL, service, (void *)i);
 			
 		//keep track of number of threads	
 			pthread_mutex_lock(&countlock);
