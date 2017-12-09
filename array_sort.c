@@ -5,10 +5,9 @@
 
 
 
-film** process_buff(char* buffer){
+film** process_buff(char* buffer, int sortby){
 	
-	int sortby;
-/*	
+	/*	
 	if(strcmp("-c",argv[1])!=0){
 		printf("ERROR: Invalid Value Type\n");
 		return 0;

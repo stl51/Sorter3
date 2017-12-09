@@ -85,7 +85,7 @@ film** mergesort(film** array, int size, int col);//pointer to unsorted array, s
 //pthread_mutex_t pathlock=PTHREAD_MUTEX_INITIALIZER;
 
 
-
+film** process_buff(char* buffer, int sortby);
 
 void free_strings(film** array, int len);//free string pointers for each struct when freeing an array
 film* filmcpy(film* filmA, film* filmB);//copy a film struct function
