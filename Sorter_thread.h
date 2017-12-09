@@ -7,10 +7,8 @@
 ******/
 
 //Suggestion: define a struct that mirrors a record (row) of the data set
-#include <dirent.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <pthread.h>
 
 struct film{
