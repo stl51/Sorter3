@@ -19,7 +19,7 @@ typedef struct tid_socket{
 	
 }tid_socket;
 
-tid_type tid_pool[array_size];
+tid_socket tid_pool=(tid_socket*)malloc(sizeof(tid_socket)*array_size);
 	
 void init_tid_pool()
 {
