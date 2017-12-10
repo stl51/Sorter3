@@ -10,17 +10,86 @@
 #define PORT 26925
 int status = 1; // for server running status
 int num_of_thread = 0; // currently created num of threads
-int array_size=1;
+int array_size=128;
 pthread_mutex_t countlock=PTHREAD_MUTEX_INITIALIZER;
 
+typedef struct tid_socket{
+	pthread_t tid;
+	int socketfd;
+	
+}tid_socket;
+
+tid_type tid_pool[array_size];
+	
+void init_tid_pool()
+{
+	for(int i = 0; i < array_size; i++)
+	{
+		tid_pool[i].socketfd = -1;
+	}
+	
+	pthread_mutex_lock(&countlock);
+	num_of_thread++;
+	pthread_mutex_unlock(&countlock);
+}
+
+
+/* return the index of available tid in pool */
+int get_tid()
+{
+	if(num_of_thread==array_size){
+			array_size = array_size * 2;
+			tids = (tid_socket*)realloc(tids, sizeof(tid_socket)*array_size);
+		}
+		
+	pthread_mutex_lock(&countlock);
+		num_of_thread++;
+	pthread_mutex_unlock(&countlock);
+	
+	return num_of_thread;
+	
+	//return -1;
+}
+
+void * service(void *args)
+{
+	// this is the socket for our server 
+	// to talk to client
+	int index = (int)args;
+	int client_socket = tid_pool[index].socketfd;
+	// define two buffers, receive and send
+	char send_buf[256] = "Hello World!";
+	char recv_buf[256];
+	/* STEP 5: receive data */
+	// use read system call to read data 
+	read(client_socket, recv_buf, 256);
+	// replace receive buffer with your buffer name
+	printf("[r] Reading from client: %s\n", recv_buf);
+
+	/* STEP 6: send data */
+	// prepare your sending data
+	// use write system call to send data
+	write(client_socket, send_buf, 256);
+
+	printf("[s] Data sent\n");
+
+	/* STEP 7: close socket */
+	close(client_socket);
+
+	
+}
+
+
+
+
 int main(int argc, char **argv){
-	//SERVE'S UP BIG KAHUNA!
+	
 	
 	int server_sock;
 	int client_sock;
 	
 	struct sockaddr_in address;
-	pthread_t * tids = (pthread_t*)malloc(sizeof(pthread_t) * 1);
+	//pthread_t * tids = (pthread_t*)malloc(sizeof(pthread_t) * 1);
 	
 	//setup of server socket
 	if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) <= 0)
@@ -57,8 +126,8 @@ int main(int argc, char **argv){
 		exit(EXIT_FAILURE);
 	}
 	
-	//create thread pool if desired
 	
+	init_tid_pool();
 	
 	while (status)	{
 		
@@ -74,31 +143,35 @@ int main(int argc, char **argv){
 			exit(EXIT_FAILURE);
 		}
 		
-		if (num_of_thread < MAX_NUM_THREAD)
-		{
+//		if (num_of_thread < MAX_NUM_THREAD)
+//		{
 		
 		//get a tid...somehow
 		
+		//keep track of number of threads	
+		//	pthread_mutex_lock(&countlock);
+		//	num_of_thread++;
+		//	pthread_mutex_unlock(&counttlock);
 		// replace socket of a tid with the client socket
-			if (num_of_thread > array_size) {
-				array_size = array_size * 2;
-				tids = (pthread_t*)realloc(tids, sizeof(pthread_t)*array_size);
-			}
-		
-		//	tid_pool[i].socketfd = client_sock;
+		//	if (num_of_thread > array_size) {
+		//		array_size = array_size * 2;
+		//		tids = (pthread_t*)realloc(tids, sizeof(pthread_t)*array_size);
+		//	}
+			int i = get_tid();
+			tid_pool[i].socketfd = client_sock;
+			pthread_create(&tid_pool[i].tid, NULL, service, (void *)i);
+	//		tid_pool[i].socketfd = client_sock;
+	//		tids[spawns - 1].
 		
 		//use tid to create a thread which calls the helper method
 	//	pthread_create(&(tids[spawns - 1]), 0, (void*) run_thru, (void*) arg);
-			pthread_create(&(tids[spawns - 1]) NULL, service, (void *)i);
+	//		pthread_create(&(tidpool[spawns - 1]) NULL, service, (void *)i);
 			
-		//keep track of number of threads	
-			pthread_mutex_lock(&countlock);
-			num_of_thread++;
-			pthread_mutex_unlock(&counttlock);
+
 			
 		//allow thread to detach so join isn't required
 		//	pthread_detach(tid_pool[i].tid);
-		}	
+//		}	
 		
 		
 	}
