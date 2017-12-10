@@ -19,10 +19,11 @@ typedef struct tid_socket{
 	
 }tid_socket;
 
-tid_socket tid_pool=(tid_socket*)malloc(sizeof(tid_socket)*array_size);
+tid_socket* tid_pool;
 	
 void init_tid_pool()
 {
+	tid_pool=(tid_socket*)malloc(sizeof(tid_socket)*array_size);
 	for(int i = 0; i < array_size; i++)
 	{
 		tid_pool[i].socketfd = -1;
@@ -58,25 +59,29 @@ void * service(void *args)
 	int index = (int)args;
 	int client_socket = tid_pool[index].socketfd;
 	// define two buffers, receive and send
-	char send_buf[256] = "Hello World!";
-	char recv_buf[256];
+	char send_buf*;
+	char recv_buf*;
+	recv_buf=(char*)malloc(sizeof(char)*1024);
 	/* STEP 5: receive data */
 	// use read system call to read data 
-	read(client_socket, recv_buf, 256);
-	// replace receive buffer with your buffer name
-	printf("[r] Reading from client: %s\n", recv_buf);
-
-	/* STEP 6: send data */
-	// prepare your sending data
-	// use write system call to send data
-	write(client_socket, send_buf, 256);
-
-	printf("[s] Data sent\n");
-
-	/* STEP 7: close socket */
-	close(client_socket);
-
+	//read(client_socket, recv_buf, 256);
 	
+	while((n=read(client_socket,recv_buf,sizeof(recv_buf)-1))>0){
+		recv_buf[n]=0;
+		if(){	//check if EOF?
+			
+		}
+		
+		if(){	//check if sort request or dump request
+			
+		}
+	}
+	
+	
+	write(client_socket, send_buf, sizeof(send_buf)-1);
+	close(client_socket);
+//		release_tid(index);
+//	num_of_thread--;
 }
 
 
