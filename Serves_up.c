@@ -73,12 +73,17 @@ void * service(void *args)
 		}
 		
 		if(){	//check if sort request or dump request
+			//if sort
+			//shift buffer to collect input file for sorting the array
 			
+			//else if dump
+			//edit send_buf
+			write(client_socket, send_buf, sizeof(send_buf)-1);
 		}
 	}
 	
 	
-	write(client_socket, send_buf, sizeof(send_buf)-1);
+//	write(client_socket, send_buf, sizeof(send_buf)-1);
 	close(client_socket);
 //		release_tid(index);
 //	num_of_thread--;
