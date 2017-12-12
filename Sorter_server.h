@@ -67,7 +67,7 @@ typedef struct sortcsv_arg sortcsv_arg;
 struct film_arg{
 		film** film_list;
 		int amount;
-		int threads;
+		//int threads;
 };
 typedef struct film_arg film_arg;
 

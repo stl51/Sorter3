@@ -5,7 +5,7 @@
 
 
 
-film** process_buff(char* buffer, int sortby){
+film_arg* process_buff(char* buffer, int sortby){
 	
 	/*	
 	if(strcmp("-c",argv[1])!=0){
@@ -76,12 +76,13 @@ film** process_buff(char* buffer, int sortby){
 	}
 	*/
 	int loop=0;
-	FILE* file=stdin;
-	char line [5000];
+	//FILE* file=stdin;
+	char* line = (char*)malloc(sizeof(char) * 5000);
 	int a_size = 50;
 	film** array=(film**)malloc(sizeof(film*)*a_size);
 	int arrayloc = 0;
-	while(fgets(line,sizeof(line),file)!=NULL){
+	line = strtok_fix(buffer, '@');
+	while(line[strlen(line) - 1] != '~'){//while it's not ~
 		loop++;
 		//printf("%d\n", loop-1);
 		if(loop==1){		//skip first line containing categories
@@ -267,12 +268,22 @@ film** process_buff(char* buffer, int sortby){
 
 		
 		}
+		line = strtok_fix(NULL, "@");
 	
 	
 	}//done reading file
 	array = mergesort(array, arrayloc, sortby);
 	//printf("done!\n");i
-    return array;
+	film_arg * ret = (film_arg*)malloc(sizeof(film_arg));
+	ret->film_list = (film**)malloc(sizeof(film*)*arrayloc);
+	int n;
+	for (n = 0; n < arrayloc; n++) {
+		(ret->film_list)[n] = (film*)malloc(sizeof(film));
+		filmcpy(array[n], (ret->film_list)[n]);
+	}
+	ret->amount = arrayloc;
+	//ret->threads = 0;
+	return ret;
 	/*
     int b;
 	for(b=0; b<arrayloc; b++){
