@@ -1,7 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Sorter_thread.h"
 #include <string.h>
+#include "Sorter_server.h"
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+
 #include <pthread.h>
 
 film** mergesort(film** array, int size, int col){//pointer to unsorted array, size of array, column to sort by
