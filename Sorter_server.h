@@ -7,11 +7,18 @@
 ******/
 
 //Suggestion: define a struct that mirrors a record (row) of the data set
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <pthread.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
 
 struct film{
 		char* color;
@@ -85,7 +92,7 @@ film** mergesort(film** array, int size, int col);//pointer to unsorted array, s
 //pthread_mutex_t pathlock=PTHREAD_MUTEX_INITIALIZER;
 
 
-film** process_buff(char* buffer, int sortby);
+film_arg* process_buff(char* buffer, int sortby);
 
 void free_strings(film** array, int len);//free string pointers for each struct when freeing an array
 film* filmcpy(film* filmA, film* filmB);//copy a film struct function
