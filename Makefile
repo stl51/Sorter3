@@ -1,8 +1,8 @@
-default: Sorter_thread.c handle_csv.c MergeSort.c
-	gcc -g -Wall -pthread -c Sorter_thread.c handle_csv.c MergeSort.c
-	gcc -g -Wall -pthread Sorter_thread.o handle_csv.o MergeSort.o -o sort_thread
-	rm Sorter_thread.o 
-	rm handle_csv.o 
+default: Serves_up.c array_sort.c MergeSort.c
+	gcc -g -Wall -pthread -c Serves_up.c array_sort.c MergeSort.c
+	gcc -g -Wall -pthread Serves_up.o array_sort.o MergeSort.o -o sort
+	rm Serves_up.o 
+	rm array_sort.o 
 	rm MergeSort.o 
 
 proc: Sorter.c handle_csv.c MergeSort.c
@@ -12,4 +12,4 @@ proc: Sorter.c handle_csv.c MergeSort.c
 	rm handle_csv.o 
 	rm MergeSort.o
 clean:
-	rm sort_thread
+	rm sort

@@ -81,7 +81,7 @@ film_arg* process_buff(char* buffer, int sortby){
 	int a_size = 50;
 	film** array=(film**)malloc(sizeof(film*)*a_size);
 	int arrayloc = 0;
-	line = strtok_fix(buffer, '@');
+	line = strtok_fix(buffer, "@");
 	while(line[strlen(line) - 1] != '~'){//while it's not ~
 		loop++;
 		//printf("%d\n", loop-1);

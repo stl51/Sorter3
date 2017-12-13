@@ -148,12 +148,14 @@ void * service(void *args)
 		printf("processing %s\n",total_buf);
 	}
 	
+    send_buf = (char*) malloc(sizeof(char)*bufsize);
 
 	//if sort
 	if(sord==0){
 		pthread_mutex_lock(&countlock);
 		film_arg* ret = process_buff(total_buf, sortby);
 		master_size += ret->amount;
+        //merge_sorted returns a film_arg*, handle that real quick
 		master = merge_sorted(master, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
 		pthread_mutex_unlock(&countlock);
 	}else if(sord==1){	//make sure that the code here actually sends things through the socket
