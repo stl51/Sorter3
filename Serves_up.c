@@ -29,7 +29,8 @@ tid_socket* tid_pool;
 void init_tid_pool()
 {
 	tid_pool=(tid_socket*)malloc(sizeof(tid_socket)*array_size);
-	for(int i = 0; i < array_size; i++)
+	int i;
+	for(i = 0; i < array_size; i++)
 	{
 		tid_pool[i].socketfd = -1;
 	}
@@ -45,7 +46,7 @@ int get_tid()
 {
 	if(num_of_thread==array_size){
 			array_size = array_size * 2;
-			tids = (tid_socket*)realloc(tids, sizeof(tid_socket)*array_size);
+			tid_pool= (tid_socket*)realloc(tid_pool, sizeof(tid_socket)*array_size);
 		}
 		
 	pthread_mutex_lock(&countlock);
@@ -74,31 +75,38 @@ void * service(void *args)
 	total_buf=(char*)malloc(sizeof(char)*1024);
 	int bufsize=1024;
 	recv_buf=(char*)malloc(sizeof(char)*1024);
+	int sortby;
 	/* STEP 5: receive data */
 	// use read system call to read data 
 	//read(client_socket, recv_buf, 256);
 	
 	while((n=read(client_socket,recv_buf,sizeof(recv_buf)-1))>0){//when this exits we've read the whole thing
 		recv_buf[n]=0;
+		
+	//	printf("reading\n");
+	//	printf("%s\n",recv_buf);
+	//	printf("end of loop\n");
+		
 		if(recv_buf[n-1]=='~'){	//check if EOF?
 			if(primer==0){	//total_buf is empty
 				strcpy(total_buf,recv_buf);
 				primer=1;
 			}else{
 				bufsize+=1024;
-				total_buf=(char*)realloc(buf,sizeof(char)*bufsize);
+				total_buf=(char*)realloc(total_buf,sizeof(char)*bufsize);
 				strcat(total_buf,recv_buf);
 			}
 			break;
 		}
 		
-		if(){	//check if sort or dump, set variable
-			if(dump){
-				sord=1;
-			}else{
-				sord=0;
-			}
-		}
+		//check if sort or dump, set variable
+/*		if(){
+			sord=1;
+		}else{	//input sortby value
+			sord=0;
+			
+		} 
+*/		
 		
 		//copy and concatenate
 		if(primer==0){	//total_buf is empty
@@ -106,33 +114,62 @@ void * service(void *args)
 			primer=1;
 		}else{
 			bufsize+=1024;
-			total_buf=(char*)realloc(buf,sizeof(char)*bufsize);
+			total_buf=(char*)realloc(total_buf,sizeof(char)*bufsize);
 			strcat(total_buf,recv_buf);
 		}		
 	
 		
 		
 	}
-
-	//if sort
-	pthread_mutex_lock(&countlock);
-	film_arg* ret = process_buff(recv_buf, sortby);
-	master_size += ret->amount;
-	master = merge_sorted(master, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
-	pthread_mutex_unlock(&countlock);
-	//if dump
-	int b;
-	//make sure send_buf is big enough, using master_size somehow
-	for (b = 0; b<master_size; b++) {
-		sprintf(send_buf, "%s,%s,%d,%d,%d,%d,%s,%d,%d,%s,%s,%s,%d,%d,%s,%d,%s,%s,%d,%s,%s,%s,%d,%d,%d,%f,%f,%d\n", master[b]->color, master[b]->director_name, master[b]->num_critic_for_reviews, master[b]->duration, master[b]->director_facebook_likes, master[b]->actor_3_facebook_likes, master[b]->actor_2_name, master[b]->actor_1_facebook_likes, master[b]->gross, master[b]->genres, master[b]->actor_1_name, master[b]->movie_title, master[b]->num_voted_users, master[b]->cast_total_facebook_likes, master[b]->actor_3_name, master[b]->facenumber_in_poster, master[b]->plot_keywords, master[b]->movie_imdb_link, master[b]->num_user_for_reviews, master[b]->language, master[b]->country, master[b]->content_rating, master[b]->budget, master[b]->title_year, master[b]->actor_2_facebook_likes, master[b]->imdb_score, master[b]->aspect_ratio, master[b]->movie_facebook_likes);
+	
+	printf("total buffer contains %s\n",total_buf);
+	
+	
+			//check if sort or dump, set variable
+	if(total_buf[0]=='d'){
+		if(total_buf[1]=='u'){
+			if(total_buf[2]=='m'){
+				if(total_buf[3]=='p'){
+					sord=1;
+				}
+			}
+		}
+	}else{	//input sortby value
+		sord=0;
+		char transit[3];
+		strncpy(transit,total_buf,2);
+		transit[3]=0;
+		sortby=atoi(transit);
+		total_buf=(char*)realloc(total_buf,bufsize+2);
+		total_buf+=2;
+		
+		
+		
+		printf("processing %s\n",total_buf);
 	}
 	
+
+	//if sort
+	if(sord==0){
+		pthread_mutex_lock(&countlock);
+		film_arg* ret = process_buff(total_buf, sortby);
+		master_size += ret->amount;
+		master = merge_sorted(master, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
+		pthread_mutex_unlock(&countlock);
+	}else if(sord==1){	//make sure that the code here actually sends things through the socket
+		//if dump
+		int b;
+		//make sure send_buf is big enough, using master_size somehow
+		for (b = 0; b<master_size; b++) {
+			sprintf(send_buf, "%s,%s,%d,%d,%d,%d,%s,%d,%d,%s,%s,%s,%d,%d,%s,%d,%s,%s,%d,%s,%s,%s,%d,%d,%d,%f,%f,%d\n", master[b]->color, master[b]->director_name, master[b]->num_critic_for_reviews, master[b]->duration, master[b]->director_facebook_likes, master[b]->actor_3_facebook_likes, master[b]->actor_2_name, master[b]->actor_1_facebook_likes, master[b]->gross, master[b]->genres, master[b]->actor_1_name, master[b]->movie_title, master[b]->num_voted_users, master[b]->cast_total_facebook_likes, master[b]->actor_3_name, master[b]->facenumber_in_poster, master[b]->plot_keywords, master[b]->movie_imdb_link, master[b]->num_user_for_reviews, master[b]->language, master[b]->country, master[b]->content_rating, master[b]->budget, master[b]->title_year, master[b]->actor_2_facebook_likes, master[b]->imdb_score, master[b]->aspect_ratio, master[b]->movie_facebook_likes);
+		}
+		write(client_socket, send_buf, sizeof(send_buf)-1);
+	}
 //	write(client_socket, send_buf, sizeof(send_buf)-1);
 	close(client_socket);
 //		release_tid(index);
 //	num_of_thread--;
 }
-
 
 
 
@@ -158,6 +195,7 @@ int main(int argc, char **argv){
 		// exit your server
 		exit(EXIT_FAILURE);
 	}
+	printf("socketed\n");
 	
 	address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
@@ -174,6 +212,7 @@ int main(int argc, char **argv){
 		// exit your program
 		exit(EXIT_FAILURE);
 	}
+	printf("bound\n");
 	
 	if (listen(server_sock, 0) < 0)
 	{
@@ -184,7 +223,7 @@ int main(int argc, char **argv){
 		// exit your program
 		exit(EXIT_FAILURE);
 	}
-	
+	printf("listening\n");
 	
 	init_tid_pool();
 	
