@@ -75,9 +75,13 @@ void * service(void *args)
 	char* send_buf;
 	char* recv_buf;
 	char* total_buf;
-	total_buf=(char*)malloc(sizeof(char)*1024);
-	int bufsize=1024;
-	recv_buf=(char*)malloc(sizeof(char)*1024);
+//	total_buf=(char*)malloc(sizeof(char)*1024);
+	total_buf=(char*)malloc(sizeof(char)*8);
+	recv_buf=(char*)malloc(sizeof(char)*8);
+	int bufsize=8;
+	
+//	int bufsize=1024;
+//	recv_buf=(char*)malloc(sizeof(char)*1024);
 	int sortby;
 	//int sendsize;
 	//sendsize=0;
@@ -88,16 +92,21 @@ void * service(void *args)
 	while((n=read(client_socket,recv_buf,sizeof(recv_buf)-1))>0){//when this exits we've read the whole thing
 		recv_buf[n]=0;
 		
+		
 	//	printf("reading\n");
-	//	printf("%s\n",recv_buf);
+	//	printf("one chunk is %s\n",recv_buf);
 	//	printf("end of loop\n");
-		sendsize+=1024;
+	//	sendsize+=1024;
+		sendsize+=8;
+		
 		if(recv_buf[n-1]=='~'){	//check if EOF?
 			if(primer==0){	//total_buf is empty
 				strcpy(total_buf,recv_buf);
 				primer=1;
 			}else{
-				bufsize+=1024;
+	//			bufsize+=1024;
+				bufsize+=8;
+				
 				total_buf=(char*)realloc(total_buf,sizeof(char)*bufsize);
 				strcat(total_buf,recv_buf);
 			}
@@ -125,7 +134,9 @@ void * service(void *args)
 			strcpy(total_buf,recv_buf);
 			primer=1;
 		}else{
-			bufsize+=1024;
+	//		bufsize+=1024;
+			bufsize+=8;
+			
 			total_buf=(char*)realloc(total_buf,sizeof(char)*bufsize);
 			strcat(total_buf,recv_buf);
 		}		
@@ -213,6 +224,10 @@ void * service(void *args)
 		write(client_socket, send_buf, sizeof(send_buf)-1);
 	}
     pthread_mutex_unlock(&countlock);
+    
+    
+//    printf("one process done\n");
+    
         //end count lock
 //	write(client_socket, send_buf, sizeof(send_buf)-1);
 	close(client_socket);
