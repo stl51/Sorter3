@@ -127,14 +127,14 @@ void * service(void *args)
 	
 			//check if sort or dump, set variable
 	if(total_buf[0]=='d'){
-		if(total_buf[1]=='u'){
-			if(total_buf[2]=='m'){
-				if(total_buf[3]=='p'){
-					sord=1;
-				}
-			}
-		}
-	}else{	//input sortby value
+		//if(total_buf[1]=='u'){
+		//	if(total_buf[2]=='m'){
+		//		if(total_buf[3]=='p'){
+			sord=1;
+		//		}
+		//	}
+		
+    }else{	//input sortby value
 		sord=0;
 		char transit[3];
 		strncpy(transit,total_buf,2);
@@ -152,6 +152,7 @@ void * service(void *args)
     //send_buf = (char*) malloc(sizeof(char)*bufsize);
 
 	//if sort
+    pthread_mutex_lock(&countlock);
 	if(sord==0){
 		//pthread_mutex_lock(&countlock);
 		film_arg* ret = process_buff(total_buf, sortby);
@@ -166,11 +167,13 @@ void * service(void *args)
             }
             filmcpy(fa->film_list[pecs], master[pecs]);
         }
+        //pthread_mutex_unlock(&countlock);
         //master = fa->film_list;
 		//pthread_mutex_unlock(&countlock);
 	}else if(sord==1){	//make sure that the code here actually sends things through the socket
 		//if dump
         //count lock here
+        //pthread_mutex_lock(&countlock);
 		int b;
 		//make sure send_buf is big enough, using master_size somehow
 		for (b = 0; b<master_size; b++) {
@@ -178,6 +181,7 @@ void * service(void *args)
 		}
 		write(client_socket, send_buf, sizeof(send_buf)-1);
 	}
+    pthread_mutex_unlock(&countlock);
         //end count lock
 //	write(client_socket, send_buf, sizeof(send_buf)-1);
 	close(client_socket);
