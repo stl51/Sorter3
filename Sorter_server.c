@@ -198,7 +198,7 @@ int main(int argc, char** argv) {
 	int size = ((film_arg*)res)->amount;
 	film** array = ((film_arg*)res)->film_list;
 	//total = ((film_arg*)res)->threads;
-	printf("\ntotal number of threads: %d\n", ((film_arg*)res)->threads+1);
+//	printf("\ntotal number of threads: %d\n", ((film_arg*)res)->threads+1);
 
 	char* nfilename = (char*)malloc(sizeof(char) * 100);
 	//memcpy(nfilename, filename, strlen(filename) - 4);
@@ -313,13 +313,13 @@ film_arg * run_thru(void* arg) {
 	film_arg * a = (film_arg*)malloc(sizeof(film_arg));
 	a->film_list = (film**)malloc(sizeof(film*));
 	a->amount = 0;
-	a->threads = spawns;
+//	a->threads = spawns;
 	while (i < spawns) {
 		pthread_join(tids[i], &status);//status needs to be a void *, then casted into a film_arg* to be merged
 		film_arg* b = (film_arg*)status;
-		int t = b->threads + a->threads;
+//		int t = b->threads + a->threads;
 		a = insert_film(a->film_list, b->film_list, a->amount, b->amount, sortby);
-		a->threads = t;
+//		a->threads = t;
 		//add function that contains merge_sorted here
 		
 		//total = total + WEXITSTATUS(status);

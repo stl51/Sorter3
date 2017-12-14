@@ -81,11 +81,19 @@ film_arg* process_buff(char* buffer, int sortby){
 	int a_size = 50;
 	film** array=(film**)malloc(sizeof(film*)*a_size);
 	int arrayloc = 0;
-	line = strtok_fix(buffer, '@');
+    while(buffer[strlen(buffer)-1] != '~'){
+        buffer[strlen(buffer)-1] = 0;
+    }
+	line = strtok_fix2(buffer, "@");
 	while(line[strlen(line) - 1] != '~'){//while it's not ~
+        if(!strlen(line)){
+            line=strtok_fix2(NULL, "@");
+            continue;
+        }
 		loop++;
 		//printf("%d\n", loop-1);
 		if(loop==1){		//skip first line containing categories
+                line=strtok_fix2(NULL, "@");
 				continue;
 		}
 		
@@ -256,6 +264,9 @@ film_arg* process_buff(char* buffer, int sortby){
 					a_size = a_size*2;
 					array = (film**)realloc(array, sizeof(film*)*a_size);
 				}
+                if(array[arrayloc] != NULL){
+                    array[arrayloc] = NULL;
+                }
 				array[arrayloc] = (film*) malloc(sizeof(film));
 				array[arrayloc] = filmcpy(x, array[arrayloc]);
 				free(x);
@@ -268,7 +279,7 @@ film_arg* process_buff(char* buffer, int sortby){
 
 		
 		}
-		line = strtok_fix(NULL, "@");
+		line = strtok_fix2(NULL, "@");
 	
 	
 	}//done reading file
@@ -297,6 +308,31 @@ film_arg* process_buff(char* buffer, int sortby){
 
 
 char* strtok_fix (char* str, char const * delim){
+	static char * src=NULL;
+	char*p=0;
+	char*ret=0;
+	
+	if(str!=NULL){
+			src=str;
+	}
+	
+	if(src==NULL){
+			return NULL;
+	}
+	
+	if((p=strpbrk(src,delim))!=NULL){
+			*p=0;
+			ret=src;
+			src=++p;
+	}else if (*src){
+			ret=src;
+			src=NULL;
+	}
+	
+	return ret;
+}
+
+char* strtok_fix2 (char* str, char const * delim){
 	static char * src=NULL;
 	char*p=0;
 	char*ret=0;
