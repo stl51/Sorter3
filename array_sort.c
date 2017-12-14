@@ -81,8 +81,15 @@ film_arg* process_buff(char* buffer, int sortby){
 	int a_size = 50;
 	film** array=(film**)malloc(sizeof(film*)*a_size);
 	int arrayloc = 0;
+    while(buffer[strlen(buffer)-1] != '~'){
+        buffer[strlen(buffer)-1] = 0;
+    }
 	line = strtok_fix2(buffer, "@");
 	while(line[strlen(line) - 1] != '~'){//while it's not ~
+        if(!strlen(line)){
+            line=strtok_fix2(NULL, "@");
+            continue;
+        }
 		loop++;
 		//printf("%d\n", loop-1);
 		if(loop==1){		//skip first line containing categories

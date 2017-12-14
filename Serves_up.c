@@ -161,6 +161,9 @@ void * service(void *args)
 		fa = merge_sorted(master, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
         int pecs;
         for(pecs=0; pecs<(fa->amount); pecs++){
+            if(master[pecs] == NULL){
+                master[pecs] = (film*) malloc(sizeof(film));
+            }
             filmcpy(fa->film_list[pecs], master[pecs]);
         }
         //master = fa->film_list;
