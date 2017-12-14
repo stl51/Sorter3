@@ -18,6 +18,7 @@ pthread_mutex_t arraylock=PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t threadlock=PTHREAD_MUTEX_INITIALIZER;
 film** master;
 int master_size;
+int sendsize=0;
 
 typedef struct tid_socket{
 	pthread_t tid;
@@ -70,13 +71,16 @@ void * service(void *args)
 	int index = (int)args;//gunna have to fix this
 	int client_socket = tid_pool[index].socketfd;
 	// define two buffers, receive and send
-	char* send_buf = (char*) malloc(sizeof(char)*2048);
+//	char* send_buf = (char*) malloc(sizeof(char)*2048);
+	char* send_buf;
 	char* recv_buf;
 	char* total_buf;
 	total_buf=(char*)malloc(sizeof(char)*1024);
 	int bufsize=1024;
 	recv_buf=(char*)malloc(sizeof(char)*1024);
 	int sortby;
+	//int sendsize;
+	//sendsize=0;
 	/* STEP 5: receive data */
 	// use read system call to read data 
 	//read(client_socket, recv_buf, 256);
@@ -87,7 +91,7 @@ void * service(void *args)
 	//	printf("reading\n");
 	//	printf("%s\n",recv_buf);
 	//	printf("end of loop\n");
-		
+		sendsize+=1024;
 		if(recv_buf[n-1]=='~'){	//check if EOF?
 			if(primer==0){	//total_buf is empty
 				strcpy(total_buf,recv_buf);
@@ -150,7 +154,7 @@ void * service(void *args)
 		printf("processing %s\n",total_buf);
 	}
 	
-    //send_buf = (char*) malloc(sizeof(char)*bufsize);
+    //send_buf = (char*) malloc(sizeof(char)*sendsize);
 
 	//if sort
     pthread_mutex_lock(&countlock);
@@ -180,6 +184,7 @@ void * service(void *args)
         //master = fa->film_list;
 		//pthread_mutex_unlock(&countlock);
 	}else if(sord==1){	//make sure that the code here actually sends things through the socket
+		send_buf = (char*) malloc(sizeof(char)*sendsize);
 		//if dump
         //count lock here
         //pthread_mutex_lock(&countlock);
