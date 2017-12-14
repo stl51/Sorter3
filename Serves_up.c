@@ -106,6 +106,7 @@ void * service(void *args)
 		
 		if(primer==0){
 				if(recv_buf[0]=='d'){
+					total_buf="d";
 						break;
 				}
 			
