@@ -69,7 +69,7 @@ void * service(void *args)
 	int index = (int)args;//gunna have to fix this
 	int client_socket = tid_pool[index].socketfd;
 	// define two buffers, receive and send
-	char* send_buf;
+	char* send_buf = (char*) malloc(sizeof(char)*2048);
 	char* recv_buf;
 	char* total_buf;
 	total_buf=(char*)malloc(sizeof(char)*1024);
@@ -140,6 +140,7 @@ void * service(void *args)
 		strncpy(transit,total_buf,2);
 		transit[3]=0;
 		sortby=atoi(transit);
+        sortby++;
 		total_buf=(char*)realloc(total_buf,bufsize+2);
 		total_buf+=2;
 		
@@ -148,18 +149,25 @@ void * service(void *args)
 		printf("processing %s\n",total_buf);
 	}
 	
-    send_buf = (char*) malloc(sizeof(char)*bufsize);
+    //send_buf = (char*) malloc(sizeof(char)*bufsize);
 
 	//if sort
 	if(sord==0){
-		pthread_mutex_lock(&countlock);
+		//pthread_mutex_lock(&countlock);
 		film_arg* ret = process_buff(total_buf, sortby);
 		master_size += ret->amount;
         //merge_sorted returns a film_arg*, handle that real quick
-		master = merge_sorted(master, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
-		pthread_mutex_unlock(&countlock);
+        film_arg* fa;
+		fa = merge_sorted(master, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
+        int pecs;
+        for(pecs=0; pecs<(fa->amount); pecs++){
+            filmcpy(fa->film_list[pecs], master[pecs]);
+        }
+        //master = fa->film_list;
+		//pthread_mutex_unlock(&countlock);
 	}else if(sord==1){	//make sure that the code here actually sends things through the socket
 		//if dump
+        //count lock here
 		int b;
 		//make sure send_buf is big enough, using master_size somehow
 		for (b = 0; b<master_size; b++) {
@@ -167,6 +175,7 @@ void * service(void *args)
 		}
 		write(client_socket, send_buf, sizeof(send_buf)-1);
 	}
+        //end count lock
 //	write(client_socket, send_buf, sizeof(send_buf)-1);
 	close(client_socket);
 //		release_tid(index);

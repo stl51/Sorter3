@@ -86,6 +86,7 @@ film_arg* process_buff(char* buffer, int sortby){
 		loop++;
 		//printf("%d\n", loop-1);
 		if(loop==1){		//skip first line containing categories
+                line=strtok_fix(NULL, "@");
 				continue;
 		}
 		
@@ -256,6 +257,9 @@ film_arg* process_buff(char* buffer, int sortby){
 					a_size = a_size*2;
 					array = (film**)realloc(array, sizeof(film*)*a_size);
 				}
+                if(array[arrayloc] != NULL){
+                    array[arrayloc] = NULL;
+                }
 				array[arrayloc] = (film*) malloc(sizeof(film));
 				array[arrayloc] = filmcpy(x, array[arrayloc]);
 				free(x);
