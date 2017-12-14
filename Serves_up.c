@@ -180,25 +180,25 @@ void * service(void *args)
     pthread_mutex_lock(&countlock);
 	if(sord==0){
 		//pthread_mutex_lock(&countlock);
-		film_arg* ret = process_buff(total_buf, sortby);//sorted csv
+		film_arg* ret = process_buff(total_buf, sortby);//buffer in array form
         int prevms = master_size;
 		master_size += ret->amount;//incremented size of master array
-        film** mas_copy = (film**) malloc(sizeof(film*)*master_size-(ret->amount));
-        int calf;
-        for(calf=0; calf<master_size-(ret->amount); calf++){
-            if(mas_copy[calf] == NULL){
-                mas_copy[calf] = (film*) malloc(sizeof(film));
-             }
-             filmcpy(master[calf], mas_copy[calf]);
-        }
-        film_arg* fa;
-		fa = merge_sorted(mas_copy, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
+        //film** mas_copy = (film**) malloc(sizeof(film*)*prevms);
+        //int calf;
+        //for(calf=0; calf<prevms; calf++){
+         //   if(mas_copy[calf] == NULL){
+        //        mas_copy[calf] = (film*) malloc(sizeof(film));
+        //     }
+         //    filmcpy(master[calf], mas_copy[calf]);
+        //}
+        //film_arg* fa;
+		//fa = merge_sorted(mas_copy, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
         int pecs;
-        for(pecs=0; pecs<(fa->amount); pecs++){
-            if(pecs>=prevms){
-                master[pecs] = (film*) malloc(sizeof(film));
-            }
-            filmcpy(fa->film_list[pecs], master[pecs]);
+        for(pecs=prevms; pecs<(ret->amount); pecs++){
+        //    if(pecs>=prevms){
+            master[pecs] = (film*) malloc(sizeof(film));
+        //    }
+            filmcpy(ret->film_list[pecs-prevms], master[pecs]);
         }
         //pthread_mutex_unlock(&countlock);
         //master = fa->film_list;
@@ -208,6 +208,7 @@ void * service(void *args)
 		//if dump
         //count lock here
         //pthread_mutex_lock(&countlock);
+        master = mergesort(master, master_size, sortby);
 		int b;
 		//make sure send_buf is big enough, using master_size somehow
 		
@@ -319,7 +320,7 @@ int main(int argc, char **argv){
 		//		array_size = array_size * 2;
 		//		tids = (pthread_t*)realloc(tids, sizeof(pthread_t)*array_size);
 		//	}
-		pthread_mutex_unlock(&threadlock);
+		pthread_mutex_lock(&threadlock);
 			int i = get_tid();
 			tid_pool[i].socketfd = client_sock;
 			pthread_create(&tid_pool[i].tid, NULL, service, (void *)i);

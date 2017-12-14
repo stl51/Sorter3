@@ -283,7 +283,8 @@ film_arg* process_buff(char* buffer, int sortby){
 	
 	
 	}//done reading file
-	array = mergesort(array, arrayloc, sortby);
+    //instead of sorting, we just return base array
+	//array = mergesort(array, arrayloc, sortby);
 	//printf("done!\n");i
 	film_arg * ret = (film_arg*)malloc(sizeof(film_arg));
 	ret->film_list = (film**)malloc(sizeof(film*)*arrayloc);
