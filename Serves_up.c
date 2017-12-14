@@ -156,14 +156,22 @@ void * service(void *args)
     pthread_mutex_lock(&countlock);
 	if(sord==0){
 		//pthread_mutex_lock(&countlock);
-		film_arg* ret = process_buff(total_buf, sortby);
-		master_size += ret->amount;
-        //merge_sorted returns a film_arg*, handle that real quick
+		film_arg* ret = process_buff(total_buf, sortby);//sorted csv
+        int prevms = master_size;
+		master_size += ret->amount;//incremented size of master array
+        film** mas_copy = (film**) malloc(sizeof(film*)*master_size-(ret->amount));
+        int calf;
+        for(calf=0; calf<master_size-(ret->amount); calf++){
+            if(mas_copy[calf] == NULL){
+                mas_copy[calf] = (film*) malloc(sizeof(film));
+             }
+             filmcpy(master[calf], mas_copy[calf]);
+        }
         film_arg* fa;
-		fa = merge_sorted(master, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
+		fa = merge_sorted(mas_copy, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
         int pecs;
         for(pecs=0; pecs<(fa->amount); pecs++){
-            if(master[pecs] == NULL){
+            if(pecs>=prevms){
                 master[pecs] = (film*) malloc(sizeof(film));
             }
             filmcpy(fa->film_list[pecs], master[pecs]);
