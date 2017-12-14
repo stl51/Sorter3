@@ -104,6 +104,12 @@ void * service(void *args)
 			break;
 		}
 		
+		if(primer==0){
+				if(recv_buf[0]=='d'){
+						break;
+				}
+			
+		}
 		//check if sort or dump, set variable
 /*		if(){
 			sord=1;
