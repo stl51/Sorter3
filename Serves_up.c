@@ -106,7 +106,7 @@ void * service(void *args)
 		
 		if(primer==0){
 				if(recv_buf[0]=='d'){
-					total_buf="d";
+					total_buf="dump";
 						break;
 				}
 			
@@ -159,6 +159,8 @@ void * service(void *args)
 		
 		
 		printf("processing %s\n",total_buf);
+		
+		printf("total buffer size is %d\n",bufsize);
 	}
 	
     //send_buf = (char*) malloc(sizeof(char)*sendsize);
@@ -197,9 +199,17 @@ void * service(void *args)
         //pthread_mutex_lock(&countlock);
 		int b;
 		//make sure send_buf is big enough, using master_size somehow
+		
+		printf("sendsize is %d\n", sendsize);
+		
 		for (b = 0; b<master_size; b++) {
+			printf("%s\n", master[b]->movie_title);
+			
 			sprintf(send_buf, "%s,%s,%d,%d,%d,%d,%s,%d,%d,%s,%s,%s,%d,%d,%s,%d,%s,%s,%d,%s,%s,%s,%d,%d,%d,%f,%f,%d@", master[b]->color, master[b]->director_name, master[b]->num_critic_for_reviews, master[b]->duration, master[b]->director_facebook_likes, master[b]->actor_3_facebook_likes, master[b]->actor_2_name, master[b]->actor_1_facebook_likes, master[b]->gross, master[b]->genres, master[b]->actor_1_name, master[b]->movie_title, master[b]->num_voted_users, master[b]->cast_total_facebook_likes, master[b]->actor_3_name, master[b]->facenumber_in_poster, master[b]->plot_keywords, master[b]->movie_imdb_link, master[b]->num_user_for_reviews, master[b]->language, master[b]->country, master[b]->content_rating, master[b]->budget, master[b]->title_year, master[b]->actor_2_facebook_likes, master[b]->imdb_score, master[b]->aspect_ratio, master[b]->movie_facebook_likes);
 		}
+		
+		printf("sprintf complete\n");
+		
 		write(client_socket, send_buf, sizeof(send_buf)-1);
 	}
     pthread_mutex_unlock(&countlock);
