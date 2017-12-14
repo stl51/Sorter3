@@ -98,6 +98,7 @@ void free_strings(film** array, int len);//free string pointers for each struct 
 film* filmcpy(film* filmA, film* filmB);//copy a film struct function
 film* replace_NULL_w_empty(film* f);//self explanitory
 char* strtok_fix (char* str, char const * delim);//a fix to strtok to include nulls
+char* strtok_fix2 (char* str, char const * delim);//anotha one
 film_arg * sort_csv(void * arg);
 film_arg * run_thru(void* arg);
 film_arg* insert_film(film** arrayA, film** arrayB, int mid, int k, int col);
