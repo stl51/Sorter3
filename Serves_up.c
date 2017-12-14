@@ -53,7 +53,7 @@ int get_tid()
 		num_of_thread++;
 	pthread_mutex_unlock(&countlock);
 	
-	return num_of_thread;
+	return num_of_thread-1;	//decrements by 1 in order to account for array indexing
 	
 	//return -1;
 }
