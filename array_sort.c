@@ -324,3 +324,28 @@ char* strtok_fix (char* str, char const * delim){
 	
 	return ret;
 }
+
+char* strtok_fix2 (char* str, char const * delim){
+	static char * src=NULL;
+	char*p=0;
+	char*ret=0;
+	
+	if(str!=NULL){
+			src=str;
+	}
+	
+	if(src==NULL){
+			return NULL;
+	}
+	
+	if((p=strpbrk(src,delim))!=NULL){
+			*p=0;
+			ret=src;
+			src=++p;
+	}else if (*src){
+			ret=src;
+			src=NULL;
+	}
+	
+	return ret;
+}
