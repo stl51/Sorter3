@@ -15,6 +15,7 @@ int array_size=128;
 pthread_mutex_t countlock=PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t stringlock=PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t arraylock=PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t threadlock=PTHREAD_MUTEX_INITIALIZER;
 film** master;
 int master_size;
 
@@ -273,9 +274,11 @@ int main(int argc, char **argv){
 		//		array_size = array_size * 2;
 		//		tids = (pthread_t*)realloc(tids, sizeof(pthread_t)*array_size);
 		//	}
+		pthread_mutex_unlock(&threadlock);
 			int i = get_tid();
 			tid_pool[i].socketfd = client_sock;
 			pthread_create(&tid_pool[i].tid, NULL, service, (void *)i);
+		pthread_mutex_unlock(&threadlock);
 	//		tid_pool[i].socketfd = client_sock;
 	//		tids[spawns - 1].
 		
