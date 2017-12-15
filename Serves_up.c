@@ -19,6 +19,7 @@ pthread_mutex_t threadlock=PTHREAD_MUTEX_INITIALIZER;
 film** master;
 int master_size;
 int sendsize=0;
+FILE* fp;
 
 typedef struct tid_socket{
 	pthread_t tid;
@@ -180,9 +181,19 @@ void * service(void *args)
     pthread_mutex_lock(&countlock);
 	if(sord==0){
 		//pthread_mutex_lock(&countlock);
-		film_arg* ret = process_buff(total_buf, sortby);//buffer in array form
-        int prevms = master_size;
-		master_size += ret->amount;//incremented size of master array
+		//film_arg* ret = process_buff(total_buf, sortby);//buffer in array form
+        
+        while(total_buf[strlen(total_buf)-1] != '~'){
+            total_buf[strlen(total_buf)-1] = 0;
+        }
+        total_buf[strlen(total_buf)-1] = 0;
+        fp = fopen("totes.csv", "a");
+        //printf("%s\n", total_buf);
+        fwrite(total_buf, strlen(total_buf)-1, 1, fp);
+        fprintf(fp, "@");
+        fclose(fp);
+//        int prevms = master_size;
+		//master_size += ret->amount;//incremented size of master array
         //film** mas_copy = (film**) malloc(sizeof(film*)*prevms);
         //int calf;
         //for(calf=0; calf<prevms; calf++){
@@ -193,22 +204,115 @@ void * service(void *args)
         //}
         //film_arg* fa;
 		//fa = merge_sorted(mas_copy, ret->film_list, master_size-(ret->amount),ret->amount, sortby);
-        int pecs;
-        for(pecs=prevms; pecs<(ret->amount); pecs++){
+        //int pecs;
+        //for(pecs=prevms; pecs<(ret->amount); pecs++){
         //    if(pecs>=prevms){
-            master[pecs] = (film*) malloc(sizeof(film));
+        //    master[pecs] = (film*) malloc(sizeof(film));
         //    }
-            filmcpy(ret->film_list[pecs-prevms], master[pecs]);
-        }
+        //    filmcpy(ret->film_list[pecs-prevms], master[pecs]);
+        //}
         //pthread_mutex_unlock(&countlock);
         //master = fa->film_list;
 		//pthread_mutex_unlock(&countlock);
 	}else if(sord==1){	//make sure that the code here actually sends things through the socket
-		send_buf = (char*) malloc(sizeof(char)*sendsize);
+        sortby++; 
+		const char* sorttype;
+        switch (sortby)
+                 {
+                          case(1):
+                                       sorttype = "color";
+                                                break;
+                                                     case(2):
+                                                         sorttype = "director_name";
+                                                                  break;
+                                                                       case(3):
+                                                                           sorttype = "num_critic_for_reviews";
+                                                                                    break;
+                                                                                         case(4):
+                                                                                             sorttype = "duration";
+                                                                                                      break;
+                                                                                                           case(5):
+                                                                                                               sorttype = "director_facebook_likes";
+                                                                                                                        break;
+                                                                                                                             case(6):
+                                                                                                                                 sorttype = "actor_3_facebook_likes";
+                                                                                                                                          break;
+                                                                                                                                               case(7):
+                                                                                                                                                   sorttype = "actor_2_name";
+                                                                                                                                                            break;
+                                                                                                                                                                 case(8):
+                                                                                                                                                                     sorttype = "actor_1_facebook_likes";
+                                                                                                                                                                              break;
+                                                                                                                                                                                   case(9):
+                                                                                                                                                                                       sorttype = "gross";
+                                                                                                                                                                                                break;
+                                                                                                                                                                                                     case(10):
+                                                                                                                                                                                                         sorttype = "genres";
+                                                                                                                                                                                                                  break;
+                                                                                                                                                                                                                       case(11):
+                                                                                                                                                                                                                           sorttype = "actor_1_name";
+                                                                                                                                                                                                                                    break;
+                                                                                                                                                                                                                                         case(12):
+                                                                                                                                                                                                                                            sorttype = "movie_title";
+                                                                                                                                                                                                                                                     break;
+                                                                                                                                                                                                                                                          case(13):
+                                                                                                                                                                                                                                                              sorttype = "num_voted_users";
+                                                                                                                                                                                                                                                                       break;
+                                                                                                                                                                                                                                                                            case(14):
+                                                                                                                                                                                                                                                                                sorttype = "cast_total_facebook_likes";
+                                                                                                                                                                                                                                                                                         break;
+                                                                                                                                                                                                                                                                                              case(15):
+                                                                                                                                                                                                                                                                                                  sorttype = "actor_3_name";
+                                                                                                                                                                                                                                                                                                           break;
+                                                                                                                                                                                                                                                                                                                case(16):
+                                                                                                                                                                                                                                                                                                                    sorttype = "facenumber_in_poster";
+                                                                                                                                                                                                                                                                                                                             break;
+                                                                                                                                                                                                                                                                                                                                  case(17):
+                                                                                                                                                                                                                                                                                                                                      sorttype = "plot_keywords";
+                                                                                                                                                                                                                                                                                                                                               break;
+                                                                                                                                                                                                                                                                                                                                                   case(18):
+                                                                                                                                                                                                                                                                                                                                                        sorttype = "movie_imdb_link";
+                                                                                                                                                                                                                                                                                                                                                                         break;
+                                                                                                                                                                                                                                                                                                                                                                              case(19):
+                                                                                                                                                                                                                                                                                                                                                                                  sorttype = "num_user_for_reviews";
+                                                                                                                                                                                                                                                                                                                                                                                           break;
+                                                                                                                                                                                                                                                                                                                                                                                                case(20):
+                                                                                                                                                                                                                                                                                                                                                                                                    sorttype = "language";
+                                                                                                                                                                                                                                                                                                                                                                                                             break;
+                                                                                                                                                                                                                                                                                                                                                                                                                  case(21):
+                                                                                                                                                                                                                                                                                                                                                                                                                      sorttype = "country";
+                                                                                                                                                                                                                                                                                                                                                                                                                               break;
+                                                                                                                                                                                                                                                                                                                                                                                                                                    case(22):
+                                                                                                                                                                                                                                                                                                                                                                                                                                        sorttype = "content_rating";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                 break;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      case(23):
+                                                                                                                                                                                                                                                                                                                                                                                                                                                          sorttype = "budget";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   break;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        case(24):
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            sorttype = "title_year";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     break;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          case(25):
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              sorttype = "actor_2_facebook_likes";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       break;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            case(26):
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                sorttype = "imdb_score";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         break;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              case(27):
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  sorttype = "aspect_ratio";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           break;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                case(28):
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    sorttype = "movie_facebook_likes";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             break;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  default:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      break;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           }
+        sorter(sorttype, fp);
+        printf("done sorting!\n");
+        //send_buf = (char*) malloc(sizeof(char)*sendsize);
 		//if dump
         //count lock here
         //pthread_mutex_lock(&countlock);
-        master = mergesort(master, master_size, sortby);
+        //master = mergesort(master, master_size, sortby);
 		int b;
 		//make sure send_buf is big enough, using master_size somehow
 		
@@ -247,6 +351,7 @@ int main(int argc, char **argv){
 	//creation of the master array below
 	master = (film**)malloc(sizeof(film*));
 	master_size = 0;
+  //  fp = fopen("totes.csv", "a");
 
 
 	struct sockaddr_in address;
